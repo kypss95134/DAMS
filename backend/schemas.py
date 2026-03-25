@@ -2,6 +2,28 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import date, datetime
 
+class EmployeeBase(BaseModel):
+    name: str
+    department: Optional[str] = None
+class EmployeeCreate(EmployeeBase): pass
+class EmployeeSchema(EmployeeBase):
+    id: int
+    class Config: orm_mode = True
+
+class OfficeBase(BaseModel):
+    name: str
+class OfficeCreate(OfficeBase): pass
+class OfficeSchema(OfficeBase):
+    id: int
+    class Config: orm_mode = True
+
+class DepartmentBase(BaseModel):
+    name: str
+class DepartmentCreate(DepartmentBase): pass
+class DepartmentSchema(DepartmentBase):
+    id: int
+    class Config: orm_mode = True
+
 # Device History Schemas
 class DeviceHistoryBase(BaseModel):
     action: str

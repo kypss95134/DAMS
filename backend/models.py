@@ -3,6 +3,23 @@ from sqlalchemy.orm import relationship
 import datetime
 from database import Base
 
+class Employee(Base):
+    __tablename__ = "employees"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, nullable=False)
+    department = Column(String(100))
+
+class Office(Base):
+    __tablename__ = "offices"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, nullable=False)
+
+class Department(Base):
+    __tablename__ = "departments"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, nullable=False)
+
+
 class Device(Base):
     __tablename__ = "devices"
 
