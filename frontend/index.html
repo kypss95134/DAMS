@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公司數位設備管理系統 (DAMS)</title>
+    <!-- 引入 Bootstrap 5 (CSS Only) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-primary">數位設備管理系統 (DAMS)</h1>
+        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+            + 新增設備
+        </button>
+    </div>
+
+    <!-- 設備列表 -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>狀態</th>
+                            <th>辨識碼</th>
+                            <th>名稱</th>
+                            <th>部門</th>
+                            <th>使用人</th>
+                            <th>時間</th>
+                            <th class="text-end">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deviceTableBody">
+                        <!-- 資料由 JS 載入 -->
+                        <tr><td colspan="7" class="text-center py-4 text-muted">正在載入設備資料...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增設備 Modal -->
+<div class="modal fade" id="addDeviceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">新增設備</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDeviceForm">
+                    <div class="mb-3">
+                        <label class="form-label">設備辨識碼 *</label>
+                        <input type="text" class="form-control" name="asset_tag" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">設備名稱 *</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">系統型號</label>
+                            <input type="text" class="form-control" name="system_model">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">辦公室號碼</label>
+                            <input type="text" class="form-control" name="office_number">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">備註</label>
+                        <textarea class="form-control" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary px-4" onclick="createDevice()">儲存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 領用設備 Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">領用設備</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <input type="hidden" id="checkoutDeviceId">
+                    <div class="mb-3">
+                        <label class="form-label">領用人 *</label>
+                        <input type="text" class="form-control" id="checkoutAssignee" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">所屬部門 *</label>
+                        <input type="text" class="form-control" id="checkoutDepartment" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">領用日期 *</label>
+                        <input type="date" class="form-control" id="checkoutDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success px-4" onclick="checkoutDevice()">確認領用</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 歸還設備 Modal -->
+<div class="modal fade" id="returnModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">歸還設備</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm">
+                    <input type="hidden" id="returnDeviceId">
+                    <div class="mb-3">
+                        <label class="form-label">歸還日期 *</label>
+                        <input type="date" class="form-control" id="returnDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-warning px-4" onclick="returnDevice()">確認歸還</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 歷史紀錄 Modal -->
+<div class="modal fade" id="historyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">歷史紀錄</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>日期時間</th>
+                                <th>動作</th>
+                                <th>相關人員</th>
+                                <th>備註</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap & JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
